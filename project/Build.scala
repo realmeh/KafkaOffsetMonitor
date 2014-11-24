@@ -1,7 +1,7 @@
 import sbt._
-import Keys._
+import sbt.Keys._
 import sbtassembly.Plugin._
-import AssemblyKeys._
+import scala.Some
 
 object KafkaUtilsBuild extends Build {
 
@@ -21,13 +21,34 @@ object KafkaUtilsBuild extends Build {
     libraryDependencies ++= Seq(
       "log4j" % "log4j" % "1.2.17",
       "org.scalatest" %% "scalatest" % "1.9.1" % "test",
-      "org.apache.kafka" %% "kafka" % "0.8.1"))
+      "org.apache.kafka" %% "kafka" % "0.8.1"),
+      publishTo <<= version { (v: String) =>
+        if (v.endsWith("SNAPSHOT")) Some(Resolvers.finnDeploySnapshots) else Some(Resolvers.finnDeployRelease)
+      }
+
+  )
 
   val slf4jVersion = "1.6.1"
 
   //offsetmonitor project
 
   lazy val offsetmonitor = Project("offsetmonitor", file("."), settings = offsetmonSettings)
+
+
+  object Resolvers {
+
+    val javaM2 = "java m2" at  "http://download.java.net/maven/2"
+
+    val finnScala = "Finn Scala" at "http://mavenproxy.finntech.no/finntech-scala/"
+
+    val finnRelease = "Finn release" at "http://mavenproxy.finntech.no/nexus/content/groups/finntech-release"
+
+    val finnDeploySnapshots = "Finn snapshots" at "http://mavenproxy.finntech.no/nexus/content/repositories/finntech-internal-snapshot"
+
+    val finnDeployRelease = "Finn deploy release" at "http://mavenproxy.finntech.no/nexus/content/repositories/finntech-internal-release"
+
+    val twitter = "twitter repo" at "http://maven.twttr.com"
+  }
 
   def offsetmonSettings = sharedSettings ++ Seq(
     name := "KafkaOffsetMonitor",
@@ -40,6 +61,9 @@ object KafkaUtilsBuild extends Build {
       "org.xerial" % "sqlite-jdbc" % "3.7.2",
       "com.twitter" % "util-core" % "3.0.0"),
     resolvers ++= Seq(
-      "java m2" at "http://download.java.net/maven/2",
-      "twitter repo" at "http://maven.twttr.com"))
+      Resolvers.finnScala,
+      Resolvers.finnRelease,
+      Resolvers.finnDeploySnapshots,
+      Resolvers.javaM2,
+      Resolvers.twitter))
 }

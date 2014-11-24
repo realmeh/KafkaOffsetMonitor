@@ -1,0 +1,28 @@
+{
+  "links": {
+    "build": "https://bamboo.finn.no/browse/KAFKAOFFSETMONITOR",
+    "repository": "https://github.com/finn-no/KafkaOffsetMonitor"
+  },
+  "versions": {
+    "jdk": "1.8"
+  },
+  "env": {},
+  "tasks": {
+    "default": [
+        {
+            "command": "./sbt clean compile"
+        }
+    ],
+    "deploy": [
+          {
+              "command": "./sbt clean publish",
+              "pipelines": [
+                  {
+                      "name": "kafkaoffsetmonitor",
+                      "pattern": "published:\\s+(http://.+/kafkaoffsetmonitor_(.*).jar)"
+                  }
+              ]
+          }
+    ]
+  }
+}

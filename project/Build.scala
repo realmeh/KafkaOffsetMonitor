@@ -1,3 +1,4 @@
+import aether.Aether
 import sbt._
 import sbt.Keys._
 import sbtassembly.Plugin._
@@ -26,7 +27,7 @@ object KafkaUtilsBuild extends Build {
         if (v.endsWith("SNAPSHOT")) Some(Resolvers.finnDeploySnapshots) else Some(Resolvers.finnDeployRelease)
       }
 
-  )
+  ) ++ Aether.aetherPublishSettings
 
   val slf4jVersion = "1.6.1"
 

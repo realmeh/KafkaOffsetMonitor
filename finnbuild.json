@@ -1,6 +1,6 @@
 {
   "links": {
-    "build": "https://bamboo.finn.no/browse/KAFKAOFFSETMONITOR",
+    "build": "https://bamboo.finn.no/browse/KAFKALOGGING-KAFKAMONITOR",
     "repository": "https://github.com/finn-no/KafkaOffsetMonitor"
   },
   "versions": {
@@ -19,7 +19,7 @@
               "pipelines": [
                   {
                       "name": "kafkaoffsetmonitor",
-                      "pattern": "published:\\s+(http://.+/kafkaoffsetmonitor_(.*).jar)"
+                      "pattern": "Uploaded:\\s+(http://.+/kafkaoffsetmonitor_(.*).jar)"
                   }
               ]
           }

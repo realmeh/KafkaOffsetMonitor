@@ -20,7 +20,7 @@
               "pipelines": [
                   {
                       "name": "kafkaoffsetmonitor",
-                      "pattern": "Uploaded: (http://.+/KafkaOffsetMonitor_2.10-(.*).jar)"
+                      "pattern": "Uploaded: (http://.+/KafkaOffsetMonitor_2.10-(.*)-assembly.jar)"
                   }
               ]
           }

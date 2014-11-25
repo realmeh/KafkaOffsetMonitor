@@ -33,12 +33,10 @@ object KafkaUtilsBuild extends Build {
         art.copy(`classifier` = Some("assembly"))
       }
 
-  )
-  addArtifact(artifact in (Compile, assembly), assembly)
+  ) ++ addArtifact(artifact in (Compile, assembly), assembly)
 
   val slf4jVersion = "1.6.1"
 
-  addArtifact(artifact in (Compile, assembly), assembly)
   //offsetmonitor project
 
   lazy val offsetmonitor = Project("offsetmonitor", file("."), settings = offsetmonSettings)

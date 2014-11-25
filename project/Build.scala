@@ -1,12 +1,13 @@
-import aether.Aether
+import aether.Aether._
 import sbt._
 import sbt.Keys._
 import sbtassembly.Plugin._
+import AssemblyKeys._
 import scala.Some
 
 object KafkaUtilsBuild extends Build {
 
-  def sharedSettings = Defaults.defaultSettings ++ assemblySettings ++ Seq(
+  def sharedSettings = Defaults.defaultSettings ++ assemblySettings ++ aetherPublishSettings ++ Seq(
     version := "0.2.1-SNAPSHOT",
     scalaVersion := "2.10.3",
     organization := "com.quantifind",
@@ -25,16 +26,22 @@ object KafkaUtilsBuild extends Build {
       "org.apache.kafka" %% "kafka" % "0.8.1"),
       publishTo <<= version { (v: String) =>
         if (v.endsWith("SNAPSHOT")) Some(Resolvers.finnDeploySnapshots) else Some(Resolvers.finnDeployRelease)
+      },
+      mainClass in assembly := Some("com.quantifind.kafka.offsetapp.OffsetGetterWeb"),
+      artifact in (Compile, assembly) := {
+        val art = (artifact in (Compile, assembly)).value
+        art.copy(`classifier` = Some("assembly"))
       }
 
-  ) ++ Aether.aetherPublishSettings
+  )
+  addArtifact(artifact in (Compile, assembly), assembly)
 
   val slf4jVersion = "1.6.1"
 
+  addArtifact(artifact in (Compile, assembly), assembly)
   //offsetmonitor project
 
   lazy val offsetmonitor = Project("offsetmonitor", file("."), settings = offsetmonSettings)
-
 
   object Resolvers {
 
@@ -53,6 +60,11 @@ object KafkaUtilsBuild extends Build {
 
   def offsetmonSettings = sharedSettings ++ Seq(
     name := "KafkaOffsetMonitor",
+
+    artifact in(Compile, assembly) := {
+      val art = (artifact in(Compile, assembly)).value
+      art.copy(`classifier` = Some("assembly"))
+    },
     libraryDependencies ++= Seq(
       "net.databinder" %% "unfiltered-filter" % "0.6.7",
       "net.databinder" %% "unfiltered-jetty" % "0.6.7",
@@ -66,5 +78,7 @@ object KafkaUtilsBuild extends Build {
       Resolvers.finnRelease,
       Resolvers.finnDeploySnapshots,
       Resolvers.javaM2,
-      Resolvers.twitter))
+      Resolvers.twitter
+    )
+  )
 }

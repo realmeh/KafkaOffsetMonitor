@@ -1,13 +1,12 @@
 import aether.Aether._
 import sbt._
 import sbt.Keys._
-import sbtassembly.Plugin._
-import AssemblyKeys._
+import com.earldouglas.xwp.XwpPlugin._
 import scala.Some
 
 object KafkaUtilsBuild extends Build {
 
-  def sharedSettings = Defaults.defaultSettings ++ assemblySettings ++ aetherPublishSettings ++ Seq(
+  def sharedSettings = Defaults.defaultSettings ++ aetherPublishSettings ++ warSettings ++ webappSettings  ++ Seq(
     version := "0.2.1-SNAPSHOT",
     scalaVersion := "2.10.3",
     organization := "com.quantifind",
@@ -24,16 +23,19 @@ object KafkaUtilsBuild extends Build {
       "log4j" % "log4j" % "1.2.17",
       "org.scalatest" %% "scalatest" % "1.9.1" % "test",
       "org.apache.kafka" %% "kafka" % "0.8.1"),
-      publishTo <<= version { (v: String) =>
-        if (v.endsWith("SNAPSHOT")) Some(Resolvers.finnDeploySnapshots) else Some(Resolvers.finnDeployRelease)
-      },
-      mainClass in assembly := Some("com.quantifind.kafka.offsetapp.OffsetGetterWeb"),
-      artifact in (Compile, assembly) := {
-        val art = (artifact in (Compile, assembly)).value
-        art.copy(`classifier` = Some("assembly"))
-      }
+    publishTo <<= version { (v: String) =>
+      if (v.endsWith("SNAPSHOT")) Some(Resolvers.finnDeploySnapshots) else Some(Resolvers.finnDeployRelease)
+    },
+  //import AssemblyKeys._
+//    mainClass in assembly := Some("com.quantifind.kafka.offsetapp.OffsetGetterWeb"),
+//    artifact in (Compile, assembly) := {
+//      val art = (artifact in (Compile, assembly)).value
+//      art.copy(`classifier` = Some("assembly"))
+//    },
+    webappSrc in webapp <<= (sourceDirectory in Compile) map  { _ / "resources/offsetapp" }
 
-  ) ++ addArtifact(artifact in (Compile, assembly), assembly)
+
+  )
 
   val slf4jVersion = "1.6.1"
 
@@ -58,11 +60,6 @@ object KafkaUtilsBuild extends Build {
 
   def offsetmonSettings = sharedSettings ++ Seq(
     name := "KafkaOffsetMonitor",
-
-    artifact in(Compile, assembly) := {
-      val art = (artifact in(Compile, assembly)).value
-      art.copy(`classifier` = Some("assembly"))
-    },
     libraryDependencies ++= Seq(
       "net.databinder" %% "unfiltered-filter" % "0.6.7",
       "net.databinder" %% "unfiltered-jetty" % "0.6.7",
@@ -70,7 +67,9 @@ object KafkaUtilsBuild extends Build {
       "com.quantifind" %% "sumac" % "0.3.0",
       "com.typesafe.slick" %% "slick" % "2.0.0",
       "org.xerial" % "sqlite-jdbc" % "3.7.2",
-      "com.twitter" % "util-core" % "3.0.0"),
+      "com.twitter" % "util-core" % "3.0.0",
+      "log4j" % "log4j" % "2-finn-empty",
+      "no.finntech" % "commons-service" % "3.2"),
     resolvers ++= Seq(
       Resolvers.finnScala,
       Resolvers.finnRelease,

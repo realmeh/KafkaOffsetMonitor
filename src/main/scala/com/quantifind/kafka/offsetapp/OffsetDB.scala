@@ -56,7 +56,11 @@ class OffsetDB(dbfile: String) {
   def insert(timestamp: Long, info: OffsetInfo) {
     database.withSession {
       implicit s =>
-        offsets += DbOffsetInfo(timestamp = timestamp, offset = info)
+        try {
+          offsets += DbOffsetInfo(timestamp = timestamp, offset = info)
+        } finally {
+          s.close()
+        }
     }
   }
 
@@ -64,33 +68,50 @@ class OffsetDB(dbfile: String) {
     val now = System.currentTimeMillis
     database.withSession {
       implicit s =>
-        offsets ++= info.map(i => DbOffsetInfo(timestamp = now, offset = i))
+        try {
+          offsets ++= info.map(i => DbOffsetInfo(timestamp = now, offset = i))
+        } finally {
+          s.close()
+        }
     }
   }
 
   def emptyOld(since: Long) {
     database.withSession {
       implicit s =>
-        offsets.where(_.timestamp < since).delete
+        try {
+          offsets.where(_.timestamp < since).delete
+        } finally {
+          s.close()
+        }
     }
   }
 
   def offsetHistory(group: String, topic: String): OffsetHistory = database.withSession {
     implicit s =>
-      val o = offsets
-        .where(off => off.group === group && off.topic === topic)
-        .sortBy(_.timestamp)
-        .map(_.forHistory)
-        .list()
-      OffsetHistory(group, topic, o)
+      try {
+        val o = offsets
+          .where(off => off.group === group && off.topic === topic)
+          .sortBy(_.timestamp)
+          .map(_.forHistory)
+          .list()
+        OffsetHistory(group, topic, o)
+      } finally {
+        s.close()
+      }
   }
 
   def maybeCreate() {
     database.withSession {
       implicit s =>
-        if (MTable.getTables("OFFSETS").list().isEmpty) {
-          offsets.ddl.create
+        try {
+          if (MTable.getTables("OFFSETS").list().isEmpty) {
+            offsets.ddl.create
+          }
+        } finally {
+          s.close()
         }
+
     }
   }
 

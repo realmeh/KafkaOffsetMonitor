@@ -9,12 +9,14 @@ import com.quantifind.kafka.offsetapp.{OffsetGetterWeb, OWArgs}
 import org.constretto.util.StaticlyCachedConfiguration.config
 import org.constretto.ConstrettoConfiguration
 
-class KafkaOffsetMonitorFilter  extends Plan with Logging {
-    Log4jConfigurator.startUp()
+class KafkaOffsetMonitorFilter extends Plan with Logging {
+  Log4jConfigurator.startUp()
 
-    private def underlying: Plan =  OffsetGetterWeb.setup(new ConstrettoArgs)
+  object KafkaOffsetMonitorFilter {
+    lazy val plan = OffsetGetterWeb.setup(new ConstrettoArgs)
+  }
 
-    override def intent: Plan.Intent = underlying.intent
+  override def intent: Plan.Intent = KafkaOffsetMonitorFilter.plan.intent
 }
 
 
@@ -25,5 +27,5 @@ class ConstrettoArgs extends OWArgs {
 
   zk = monitorConfig.evaluateToString("zk")
   refresh = FiniteDuration(monitorConfig.evaluateToLong("refresh"), TimeUnit.SECONDS)
-  retain =  FiniteDuration(monitorConfig.evaluateToLong("retain"), TimeUnit.DAYS)
+  retain = FiniteDuration(monitorConfig.evaluateToLong("retain"), TimeUnit.DAYS)
 }

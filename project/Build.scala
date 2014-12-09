@@ -26,12 +26,6 @@ object KafkaUtilsBuild extends Build {
     publishTo <<= version { (v: String) =>
       if (v.endsWith("SNAPSHOT")) Some(Resolvers.finnDeploySnapshots) else Some(Resolvers.finnDeployRelease)
     },
-  //import AssemblyKeys._
-//    mainClass in assembly := Some("com.quantifind.kafka.offsetapp.OffsetGetterWeb"),
-//    artifact in (Compile, assembly) := {
-//      val art = (artifact in (Compile, assembly)).value
-//      art.copy(`classifier` = Some("assembly"))
-//    },
     webappSrc in webapp <<= (sourceDirectory in Compile) map  { _ / "resources/offsetapp" }
 
 

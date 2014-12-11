@@ -27,8 +27,6 @@ object KafkaUtilsBuild extends Build {
       if (v.endsWith("SNAPSHOT")) Some(Resolvers.finnDeploySnapshots) else Some(Resolvers.finnDeployRelease)
     },
     webappSrc in webapp <<= (sourceDirectory in Compile) map  { _ / "resources/offsetapp" }
-
-
   )
 
   val slf4jVersion = "1.6.1"

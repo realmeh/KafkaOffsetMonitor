@@ -2,6 +2,8 @@ package com.quantifind.kafka.offsetapp
 
 import java.util.{Timer, TimerTask}
 
+import unfiltered.filter.request.ContextPath
+
 import scala.concurrent.duration._
 
 import com.quantifind.kafka.OffsetGetter.KafkaInfo
@@ -136,21 +138,21 @@ object OffsetGetterWeb extends UnfilteredWebApp[OWArgs] with Logging {
     schedule(args)
 
     def intent: Plan.Intent = {
-      case GET(Path(Seg("group" :: Nil))) =>
+      case GET(ContextPath(_, Seg("group" :: Nil))) =>
         JsonContent ~> ResponseString(write(getGroups(args)))
-      case GET(Path(Seg("group" :: group :: Nil))) =>
+      case GET(ContextPath(_, Seg("group" :: group :: Nil))) =>
         val info = getInfo(group, args)
         JsonContent ~> ResponseString(write(info)) ~> Ok
-      case GET(Path(Seg("group" :: group :: topic :: Nil))) =>
+      case GET(ContextPath(_, Seg("group" :: group :: topic :: Nil))) =>
         val offsets = args.db.offsetHistory(group, topic)
         JsonContent ~> ResponseString(write(offsets)) ~> Ok
-      case GET(Path(Seg("topiclist" :: Nil))) =>
+      case GET(ContextPath(_, Seg("topiclist" :: Nil))) =>
         JsonContent ~> ResponseString(write(getTopics(args)))
-      case GET(Path(Seg("clusterlist" :: Nil))) =>
+      case GET(ContextPath(_, Seg("clusterlist" :: Nil))) =>
         JsonContent ~> ResponseString(write(getClusterViz(args)))
-      case GET(Path(Seg("topicdetails" :: group :: Nil))) =>
+      case GET(ContextPath(_, Seg("topicdetails" :: group :: Nil))) =>
         JsonContent ~> ResponseString(write(getTopicDetail(group, args)))
-      case GET(Path(Seg("activetopics" :: Nil))) =>
+      case GET(ContextPath(_, Seg("activetopics" :: Nil))) =>
         JsonContent ~> ResponseString(write(getActiveTopics(args)))
     }
   }
